@@ -21,7 +21,7 @@ namespace GitCleanup
             if (args == null)
                 return;
             args.Repo = System.IO.Path.GetFullPath(args.Repo);
-            var repo = new Repository(args.Repo);
+            var repo = new Repository(Repository.Discover(args.Repo));
             repo.Fetch("origin", new FetchOptions() { Prune = true });
             var trunk = repo.Branches.Single(b => b.FriendlyName == args.Trunk);
             var mergedBranches = new List<Branch>();
