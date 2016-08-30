@@ -11,15 +11,16 @@ namespace GitCleanup
     {
         class Args
         {
-            public string Repo { get; set; }
+            public string Repo { get; set; } = ".";
             public string Remote { get; set; } = "origin";
-            public string Trunk { get; set; } = "dev";
+            public string Trunk { get; set; } = "master";
         }
         static void Main(string[] stringArgs)
         {
             var args = PowerCommandParser.Parser.ParseArguments<Args>(stringArgs, true);
             if (args == null)
                 return;
+            args.Repo = System.IO.Path.GetFullPath(args.Repo);
             var repo = new Repository(args.Repo);
             repo.Fetch("origin", new FetchOptions() { Prune = true });
             var trunk = repo.Branches.Single(b => b.FriendlyName == args.Trunk);
