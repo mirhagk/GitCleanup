@@ -28,12 +28,10 @@ namespace GitCleanup
             public string Trunk { get; set; } = "master";
             public bool Cleanup { get; set; }
             public bool WhatDo { get; set; }
-            public bool SkipPrune { get; set; }
         }
         static void Cleanup(Repository repo, Args args)
         {
-            if (!args.SkipPrune)
-                repo.Fetch("origin", new FetchOptions() { Prune = true });
+            RunCommand("git fetch -p", args.Repo);
 
             var trunk = repo.Branches.Single(b => b.FriendlyName == args.Trunk);
             var mergedBranches = new List<Branch>();
@@ -51,6 +49,20 @@ namespace GitCleanup
                 }
             }
             Console.WriteLine("Done cleaning up.");
+        }
+        static string RunCommand(string command, string workingDirectory)
+        {
+            var process = new System.Diagnostics.Process();
+            process.StartInfo = new System.Diagnostics.ProcessStartInfo("cmd",$"/c {command}")
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                WorkingDirectory = workingDirectory
+            };
+            process.Start();
+            var result = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return result;
         }
         static void GitFlowStartNewBranch(Repository repo, Args args)
         {
