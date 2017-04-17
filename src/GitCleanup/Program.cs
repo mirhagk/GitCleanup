@@ -28,10 +28,13 @@ namespace GitCleanup
             public string Trunk { get; set; } = "master";
             public bool Cleanup { get; set; }
             public bool WhatDo { get; set; }
+            public bool SkipPrune { get; set; }
         }
         static void Cleanup(Repository repo, Args args)
         {
-            repo.Fetch("origin", new FetchOptions() { Prune = true });
+            if (!args.SkipPrune)
+                repo.Fetch("origin", new FetchOptions() { Prune = true });
+
             var trunk = repo.Branches.Single(b => b.FriendlyName == args.Trunk);
             var mergedBranches = new List<Branch>();
             foreach (var branch in repo.Branches)
